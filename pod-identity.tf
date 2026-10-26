@@ -32,9 +32,17 @@ resource "aws_eks_pod_identity_association" "ebs_csi" {
 
 # ── AWS Load Balancer Controller ─────────────────────────────────
 # Download the official policy first (see README) into policies/
+# resource "aws_iam_policy" "lb_controller" {
+#   name   = "${var.cluster_name}-lb-controller"
+#   policy = file("${path.module}/policies/aws-lb-controller-policy.json")
+# }
+
 resource "aws_iam_policy" "lb_controller" {
-  name   = "${var.cluster_name}-lb-controller"
-  policy = file("${path.module}/policies/aws-lb-controller-policy.json")
+  name        = "${var.cluster_name}-lb-controller"
+  path        = "/"
+  description = "Policy for granting rights to create loadbalancer services and EC2 volumes"
+
+  policy = jsonencode(yamldecode(file("./policy.yaml")))
 }
 
 resource "aws_iam_role" "lb_controller" {
